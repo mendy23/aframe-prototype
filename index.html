@@ -4,7 +4,6 @@
     <meta charset="utf-8">
     <title>3D VR Walkthrough - Prototype 2</title>
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-    <script src="https://unpkg.com/aframe-stereo-component@1.0.0/dist/aframe-stereo-component.min.js"></script>
   </head>
   <body>
     <a-scene>
@@ -41,22 +40,22 @@
         </a-entity>
       </a-entity>
 
-      <!-- Left eye sphere - shows TOP half of image -->
+      <!-- LEFT EYE - Shows TOP half of the image -->
       <a-entity
         id="panorama-left"
         geometry="primitive: sphere; radius: 100; segmentsWidth: 64; segmentsHeight: 64"
-        material="shader: flat; side: back; src: #hallway1"
+        material="shader: flat; side: back; src: #hallway1; repeat: 1 0.5; offset: 0 0.5"
         scale="-1 1 1"
-        stereo="eye: left; mode: top-bottom">
+        layers="type: left">
       </a-entity>
 
-      <!-- Right eye sphere - shows BOTTOM half of image -->
+      <!-- RIGHT EYE - Shows BOTTOM half of the image -->
       <a-entity
         id="panorama-right"
         geometry="primitive: sphere; radius: 100; segmentsWidth: 64; segmentsHeight: 64"
-        material="shader: flat; side: back; src: #hallway1"
+        material="shader: flat; side: back; src: #hallway1; repeat: 1 0.5; offset: 0 0"
         scale="-1 1 1"
-        stereo="eye: right; mode: top-bottom">
+        layers="type: right">
       </a-entity>
 
       <!-- Hallway Hotspots -->
@@ -64,7 +63,7 @@
         <a-sphere 
           class="clickable"
           id="toKitchenButton"
-          position="0.164 0.584 -5"
+          position="0.164 -1.314 -27.54"
           radius="0.5" 
           color="blue"
           event-set__enter="_event: mouseenter; color: #00FFFF"
@@ -75,12 +74,12 @@
         <a-sphere 
           class="clickable"
           id="styleButton"
-          position="3 1.5 -5" 
+          position="-7.017 0.609 -7.413" 
           radius="0.5" 
           color="yellow"
           event-set__enter="_event: mouseenter; color: #FFFFFF"
           event-set__leave="_event: mouseleave; color: #FFFF00">
-          <a-text value="Style" align="center" position="0 1 0" scale="3 3 3" color="black"></a-text>
+          <a-text value="Style" align="center" position="0 1 0" scale="3 3 3" color="white"></a-text>
         </a-sphere>
       </a-entity>
 
@@ -89,7 +88,7 @@
         <a-sphere 
           class="clickable"
           id="toHallwayFromKitchen"
-          position="0 1.5 -5" 
+          position="-10.8 -2.193 -13.405" 
           radius="0.5" 
           color="red"
           event-set__enter="_event: mouseenter; color: #FF00FF"
@@ -105,7 +104,7 @@
           color="yellow"
           event-set__enter="_event: mouseenter; color: #FFFFFF"
           event-set__leave="_event: mouseleave; color: #FFFF00">
-          <a-text value="Style" align="center" position="0 1 0" scale="3 3 3" color="black"></a-text>
+          <a-text value="Style" align="center" position="0 1 0" scale="3 3 3" color="white"></a-text>
         </a-sphere>
       </a-entity>
 
