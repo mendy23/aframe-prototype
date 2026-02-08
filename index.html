@@ -41,13 +41,22 @@
         </a-entity>
       </a-entity>
 
-      <!-- Single stereo panorama sphere -->
+      <!-- Left eye sphere - shows TOP half of image -->
       <a-entity
-        id="panorama"
+        id="panorama-left"
         geometry="primitive: sphere; radius: 100; segmentsWidth: 64; segmentsHeight: 64"
         material="shader: flat; side: back; src: #hallway1"
         scale="-1 1 1"
-        stereo="eye: both; mode: top-bottom">
+        stereo="eye: left; mode: top-bottom">
+      </a-entity>
+
+      <!-- Right eye sphere - shows BOTTOM half of image -->
+      <a-entity
+        id="panorama-right"
+        geometry="primitive: sphere; radius: 100; segmentsWidth: 64; segmentsHeight: 64"
+        material="shader: flat; side: back; src: #hallway1"
+        scale="-1 1 1"
+        stereo="eye: right; mode: top-bottom">
       </a-entity>
 
       <!-- Hallway Hotspots -->
@@ -126,9 +135,12 @@
         
         console.log("Switching to: " + imageId);
         
-        // Update the material src attribute
-        const panorama = document.querySelector('#panorama');
-        panorama.setAttribute('material', 'src', imageId);
+        // Update both left and right eye panoramas
+        const panoramaLeft = document.querySelector('#panorama-left');
+        const panoramaRight = document.querySelector('#panorama-right');
+        
+        panoramaLeft.setAttribute('material', 'src', imageId);
+        panoramaRight.setAttribute('material', 'src', imageId);
         
         currentRoom = roomLower;
         if (style) currentStyle = style;
