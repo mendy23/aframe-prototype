@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <title>3D VR Walkthrough - Prototype 2</title>
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-    <script src="https://unpkg.com/aframe-stereo-component/dist/aframe-stereo-component.min.js"></script>
+    <script src="https://unpkg.com/aframe-stereo-component@1.0.0/dist/aframe-stereo-component.min.js"></script>
   </head>
   <body>
-    <a-scene id="mainScene" cursor="rayOrigin: mouse">
+    <a-scene>
       
       <a-assets>
         <img id="kitchen1" src="Combo1_Kitchen.jpg" crossorigin="anonymous">
@@ -20,68 +20,87 @@
       </a-assets>
 
       <a-entity id="rig" position="0 1.6 0">
-        <a-entity id="camera" camera look-controls stereocam="eye:left;">
-          <a-entity cursor="fuse: true; fuseTimeout: 1500"
-                    position="0 0 -1"
-                    geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
-                    material="color: #FFF; shader: flat"
-                    raycaster="objects: .clickable">
-          </a-entity>
+        <a-camera look-controls>
+          <a-cursor
+            fuse="true"
+            fuse-timeout="1500"
+            raycaster="objects: .clickable">
+          </a-cursor>
+        </a-camera>
+
+        <!-- Left Controller -->
+        <a-entity 
+          laser-controls="hand: left"
+          raycaster="objects: .clickable; lineColor: red; lineOpacity: 0.5">
+        </a-entity>
+        
+        <!-- Right Controller -->
+        <a-entity 
+          laser-controls="hand: right"
+          raycaster="objects: .clickable; lineColor: blue; lineOpacity: 0.5">
         </a-entity>
       </a-entity>
 
-      <!-- Stereo skyboxes -->
-      <a-sky id="sky-left" 
-        stereo="eye: left; split: vertical" 
-        src="#hallway1">
-      </a-sky>
-
-      <a-sky id="sky-right" 
-        stereo="eye: right; split: vertical" 
-        src="#hallway1">
-      </a-sky>
+      <!-- Single stereo panorama sphere -->
+      <a-entity
+        id="panorama"
+        geometry="primitive: sphere; radius: 100; segmentsWidth: 64; segmentsHeight: 64"
+        material="shader: flat; side: back; src: #hallway1"
+        scale="-1 1 1"
+        stereo="eye: both; mode: top-bottom">
+      </a-entity>
 
       <!-- Hallway Hotspots -->
       <a-entity id="hallway-hotspots">
         <a-sphere 
-          class="clickable hotspot"
+          class="clickable"
           id="toKitchenButton"
-          position="0.164 0.584 -9.277"
-          radius="0.2" 
-          color="blue">
-          <a-text value="Go to Kitchen" align="center" position="0 0.6 0" scale="2 2 2"></a-text>
+          position="0.164 0.584 -5"
+          radius="0.5" 
+          color="blue"
+          event-set__enter="_event: mouseenter; color: #00FFFF"
+          event-set__leave="_event: mouseleave; color: #0000FF">
+          <a-text value="Kitchen" align="center" position="0 1 0" scale="3 3 3" color="white"></a-text>
         </a-sphere>
 
         <a-sphere 
-          class="clickable hotspot"
+          class="clickable"
           id="styleButton"
-          position="3.707 1.5 -6.455" 
-          radius="0.2" 
-          color="yellow">
-          <a-text value="Switch Style" align="center" position="0 0.6 0" scale="2 2 2"></a-text>
+          position="3 1.5 -5" 
+          radius="0.5" 
+          color="yellow"
+          event-set__enter="_event: mouseenter; color: #FFFFFF"
+          event-set__leave="_event: mouseleave; color: #FFFF00">
+          <a-text value="Style" align="center" position="0 1 0" scale="3 3 3" color="black"></a-text>
         </a-sphere>
       </a-entity>
 
       <!-- Kitchen Hotspots -->
       <a-entity id="kitchen-hotspots" visible="false">
         <a-sphere 
-          class="clickable hotspot"
+          class="clickable"
           id="toHallwayFromKitchen"
-          position="0 1.5 -8" 
-          radius="0.2" 
-          color="red">
-          <a-text value="Back to Hallway" align="center" position="0 0.6 0" scale="2 2 2"></a-text>
+          position="0 1.5 -5" 
+          radius="0.5" 
+          color="red"
+          event-set__enter="_event: mouseenter; color: #FF00FF"
+          event-set__leave="_event: mouseleave; color: #FF0000">
+          <a-text value="Hallway" align="center" position="0 1 0" scale="3 3 3" color="white"></a-text>
         </a-sphere>
 
         <a-sphere 
-          class="clickable hotspot"
+          class="clickable"
           id="styleButtonKitchen"
-          position="3.707 1.5 -6.455" 
-          radius="0.2" 
-          color="yellow">
-          <a-text value="Switch Style" align="center" position="0 0.6 0" scale="2 2 2"></a-text>
+          position="3 1.5 -5" 
+          radius="0.5" 
+          color="yellow"
+          event-set__enter="_event: mouseenter; color: #FFFFFF"
+          event-set__leave="_event: mouseleave; color: #FFFF00">
+          <a-text value="Style" align="center" position="0 1 0" scale="3 3 3" color="black"></a-text>
         </a-sphere>
       </a-entity>
+
+    </a-scene>
 
     <script>
       let currentStyle = '1';
@@ -91,7 +110,6 @@
         document.querySelector('#hallway-hotspots').setAttribute('visible', false);
         document.querySelector('#kitchen-hotspots').setAttribute('visible', false);
         
-        // Show hotspots for current room
         if (currentRoom === 'hallway') {
           document.querySelector('#hallway-hotspots').setAttribute('visible', true);
         } else if (currentRoom === 'kitchen') {
@@ -104,22 +122,17 @@
       function changeView(room, style) {
         const styleToUse = style || currentStyle;
         const roomLower = room.toLowerCase();
-        // Build ID to match your asset format: kitchen1, hallway8, etc.
         const imageId = `#${roomLower}${styleToUse}`;
         
         console.log("Switching to: " + imageId);
         
-        // Update both sky elements
-        const skyLeft = document.querySelector('#sky-left');
-        const skyRight = document.querySelector('#sky-right');
-        
-        skyLeft.setAttribute('src', imageId);
-        skyRight.setAttribute('src', imageId);
+        // Update the material src attribute
+        const panorama = document.querySelector('#panorama');
+        panorama.setAttribute('material', 'src', imageId);
         
         currentRoom = roomLower;
         if (style) currentStyle = style;
         
-        // Update which hotspots are visible
         updateHotspots();
       }
 
@@ -135,29 +148,26 @@
         scene.addEventListener('loaded', function() {
           console.log("Scene loaded!");
           
-          // Hallway hotspots
           document.querySelector('#toKitchenButton').addEventListener('click', function() {
             console.log("Going to kitchen");
             changeView('kitchen');
           });
           
           document.querySelector('#styleButton').addEventListener('click', function() {
-            console.log("Style button clicked (hallway)");
+            console.log("Style button clicked");
             toggleStyle();
           });
           
-          // Kitchen hotspots
           document.querySelector('#toHallwayFromKitchen').addEventListener('click', function() {
-            console.log("Going back to hallway from kitchen");
+            console.log("Back to hallway");
             changeView('hallway');
           });
           
           document.querySelector('#styleButtonKitchen').addEventListener('click', function() {
-            console.log("Style button clicked (kitchen)");
+            console.log("Style button clicked");
             toggleStyle();
           });
           
-          // Initialize hotspots for starting room
           updateHotspots();
         });
       });
